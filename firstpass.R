@@ -9,35 +9,37 @@
 # saveRDS(counts, file='~/Projects/lung/data/rawcounts.rds')
 
 #counts <- readRDS('~/Projects/lung/data/rawcounts.rds')
-counts <- readRDS('~/OneDrive - University of Southern California/lung_data/rawcounts.rds')
+#counts <- readRDS('~/OneDrive - University of Southern California/lung_data/rawcounts.rds')
 #meta <- read.csv("~/Projects/lung/data/GSE151974_cell_metadata_postfilter.csv.gz")[,-1]
-meta <- read.csv('~/OneDrive - University of Southern California/lung_data/GSE151974_cell_metadata_postfilter.csv.gz')
+#meta <- read.csv('~/OneDrive - University of Southern California/lung_data/GSE151974_cell_metadata_postfilter.csv.gz')
 
 require(SingleCellExperiment)
-sce <- SingleCellExperiment(assays = list(counts = counts), colData = meta)
-rm(counts, meta)
+#sce <- SingleCellExperiment(assays = list(counts = counts), colData = meta)
+#rm(counts, meta)
+sce <- readRDS('~/OneDrive - University of Southern California/lung_data/sce.rds')
 
 require(scry)
-sce <- devianceFeatureSelection(sce)
+#sce <- devianceFeatureSelection(sce)
 
-assay(sce,'logcounts') <- log1p(1000*t(t(assay(sce,'counts')) / colSums(assay(sce,'counts'))))
+#assay(sce,'logcounts') <- log1p(1000*t(t(assay(sce,'counts')) / colSums(assay(sce,'counts'))))
 gene.use <- which(rowData(sce)$binomial_deviance >= sort(rowData(sce)$binomial_deviance, decreasing = TRUE)[2000])
 # if deviance doesn't work:
-gene.vars <- rowVars(assay(sce,'logcounts'))
-gene.use <- which(gene.vars >= sort(gene.vars, decreasing = TRUE)[2000])
+# gene.vars <- rowVars(assay(sce,'logcounts'))
+# gene.use <- which(gene.vars >= sort(gene.vars, decreasing = TRUE)[2000])
 
 
 require(BiocSingular)
-pca <- runPCA(t(assay(sce,'logcounts')[gene.use, ]), rank = 100)
-plot((pca$sdev^2/sum(pca$sdev^2))[1:100])
+#pca <- runPCA(t(assay(sce,'logcounts')[gene.use, ]), rank = 100)
+#plot((pca$sdev^2/sum(pca$sdev^2))[1:100])
 
-reducedDim(sce,'pca') <- pca$x[,1:25]
-rm(pca)
+#reducedDim(sce,'pca') <- pca$x[,1:25]
+#rm(pca)
 
 require(uwot)
 umap <- umap(reducedDim(sce,'pca'))
 
 plot(umap, asp=1, col = colorby(sce$CellType))
+plot(umap, asp=1, col = colorby(assay(sce,'logcounts')[12404, ]))
 
 
 points(umap[which(sce$CellType=='AT1'), ], col=3)
