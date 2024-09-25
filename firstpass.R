@@ -39,31 +39,76 @@ require(uwot)
 umap <- umap(reducedDim(sce,'pca'))
 
 plot(umap, asp=1, col = colorby(sce$CellType))
-plot(umap, asp=1, col = colorby(assay(sce,'logcounts')[12404, ]))
+plot(umap, asp=1, col = c(brewer.pal(9,'Set1'),brewer.pal(8,'Set2'),brewer.pal(12,'Set3'),brewer.pal(9,'Pastel1'))[factor(sce$CellType)])
+plot(umap, asp=1, col = colorby(assay(sce,'logcounts')[12404, ])) #sftpc
 
+plot(umap, asp=1, col = colorby(assay(sce,'logcounts')['Nkx2-1', ]), main='Nkx2.1') #epithelial
+plot(umap, asp=1, col = colorby(assay(sce,'logcounts')['Epcam', ]), main='Epcam') #epithelial
 
 points(umap[which(sce$CellType=='AT1'), ], col=3)
 points(umap[which(sce$CellType=='AT2 1'), ], col=2)
 points(umap[which(sce$CellType=='AT2 2'), ], col='firebrick')
 
 
-
+# just AT1 and AT2 cells
+#########################
 subsce <- sce[, which(sce$CellType %in% c('AT1','AT2 1','AT2 2'))]
-subsce <- devianceFeatureSelection(subsce)
 
+subsce <- devianceFeatureSelection(subsce)
 gene.use <- which(rowData(subsce)$binomial_deviance >= sort(rowData(subsce)$binomial_deviance, decreasing = TRUE)[1000])
 
-subpca <- runPCA(t(assay(subsce,'logcounts')[gene.use, ]), rank = 500)
-plot((subpca$sdev^2/sum(subpca$sdev^2))[1:100])
+subpca <- runPCA(t(assay(subsce,'logcounts')[gene.use, ]), rank = 50)
+plot((subpca$sdev^2/sum(subpca$sdev^2))[1:50])
 
 pairs(subpca$x[,1:3], asp=1, col= colorby(subsce$CellType))
 pairs(subpca$x[,1:3], asp=1, col= colorby(factor(subsce$Age, levels = c('P3','P7','P14'))))
 
-umap <- umap(subpca$x[,1:20])
-plot(umap, asp=1, col = colorby(subsce$CellType))
+subumap <- umap(subpca$x[,1:20])
+plot(subumap, asp=1, col = colorby(subsce$CellType))
+
+plot(subumap, asp=1, col = 'grey80')
+points(subumap[which(assay(subsce,'counts')['Mki67',] > 0), ], col = 2)
+points(subumap[which(assay(subsce,'counts')['Top2a',] > 0), ], col = 2)
 
 
 
-umap <- umap(pca$x[which(sce$CellType %in% c('AT1','AT2 1','AT2 2','Ciliated','Club')), 1:25])
-plot(umap, asp=1, col = colorby(sce$CellType[which(sce$CellType %in% c('AT1','AT2 1','AT2 2','Ciliated','Club'))]))
+#umap <- umap(pca$x[which(sce$CellType %in% c('AT1','AT2 1','AT2 2','Ciliated','Club')), 1:25])
+#plot(umap, asp=1, col = colorby(sce$CellType[which(sce$CellType %in% c('AT1','AT2 1','AT2 2','Ciliated','Club'))]))
+
+
+
+
+
+rd <- subpca$x[subsce$CellType %in% c('AT2 1','AT2 2'), 1:3]
+cl <- subsce$CellType[subsce$CellType %in% c('AT2 1','AT2 2')]
+
+require(slingshot)
+pst <- slingshot(rd)
+
+plot(subpca$x[,1:2], asp=1, col= colorby(subsce$CellType))
+points(subpca$x[subsce$CellType %in% c('AT2 1','AT2 2'),1:2], col = colorby(slingPseudotime(pst)[,1]))
+
+plot(subumap, asp=1, col = colorby(subsce$CellType))
+points(subumap[subsce$CellType %in% c('AT2 1','AT2 2'), ], col = colorby(slingPseudotime(pst)[,1]))
+
+
+
+expr <- assay(subsce,'logcounts')[,subsce$CellType %in% c('AT2 1','AT2 2')]
+expr <- expr[rowVars(expr) > 0, ]
+
+pstCors <- apply(expr,1,function(g){
+  cor(g, slingPseudotime(pst)[,1], method='spearman')
+})
+
+
+which.max(abs(pstCors))
+
+plot(slingPseudotime(pst)[,1], assay(subsce,'logcounts')['Rpl23',subsce$CellType %in% c('AT2 1','AT2 2')])
+
+plot(subumap, asp=1, col = colorby(assay(subsce,'logcounts')['Rpl23',]))
+
+
+pstCors[order(abs(pstCors), decreasing = TRUE)]
+
+
 
