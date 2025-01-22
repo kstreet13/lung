@@ -1,0 +1,12 @@
+2024-12-06
+----------
+Parviz
+What can we do with Emma's Atlas data?
+Want to see chromatin openness for specific transcription factors
+Identify TF binding sites that are open that explain expression of target ligands/receptors
+Ex. TF-A is necessary for gene FGF; FGF may stimulate epithelial proliferation; show that TF-A has binding site on chromatin of FGF that is open; what is the status of the chromatin in the FGF, in the cell of interest
+Alt: there is expression of FGF in mesenchymal cells; what does the chromatin architecture look like?
+Trajectory analysis of EMT
+Might be interaction between mesenchyme and epithelial
+Ligand/receptor analysis of this communication
+Have list of 6 ligands - table towards the end of the grant
