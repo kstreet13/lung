@@ -39,15 +39,21 @@ require(uwot)
 umap <- umap(reducedDim(sce,'pca'))
 
 plot(umap, asp=1, col = colorby(sce$CellType))
-plot(umap, asp=1, col = c(brewer.pal(9,'Set1'),brewer.pal(8,'Set2'),brewer.pal(12,'Set3'),brewer.pal(9,'Pastel1'))[factor(sce$CellType)])
-plot(umap, asp=1, col = colorby(assay(sce,'logcounts')[12404, ])) #sftpc
+plot(umap, asp=1, col = c(brewer.pal(9,'Set1'),brewer.pal(8,'Set2'),brewer.pal(12,'Set3'),brewer.pal(9,'Pastel1'))[factor(sce$CellType)], cex=.5)
+plot.new()
+lgnd <- unique(cbind(sce$CellType, c(brewer.pal(9,'Set1'),brewer.pal(8,'Set2'),brewer.pal(12,'Set3'),brewer.pal(9,'Pastel1'))[factor(sce$CellType)]))
+lgnd <- lgnd[order(lgnd[,1]), ]
+legend('left', pch=16, col=lgnd[1:17,2], legend = lgnd[1:17,1], bty='n')
+legend('right', pch=16, col=lgnd[18:34,2], legend = lgnd[18:34,1], bty='n')
 
-plot(umap, asp=1, col = colorby(assay(sce,'logcounts')['Nkx2-1', ]), main='Nkx2.1') #epithelial
-plot(umap, asp=1, col = colorby(assay(sce,'logcounts')['Epcam', ]), main='Epcam') #epithelial
+plot(umap, asp=1, col = colorby(assay(sce,'logcounts')['Sftpc', ], colors = c('grey90','blue','darkblue')), main='Sftpc', cex=.5) #sftpc
+plot(umap, asp=1, col = colorby(assay(sce,'logcounts')['Nkx2-1', ], colors = c('grey90','blue','darkblue')), main='Nkx2.1', cex=.5) #epithelial
+plot(umap, asp=1, col = colorby(assay(sce,'logcounts')['Epcam', ], colors = c('grey90','blue','darkblue')), main='Epcam', cex=.5) #epithelial
 
-points(umap[which(sce$CellType=='AT1'), ], col=3)
-points(umap[which(sce$CellType=='AT2 1'), ], col=2)
-points(umap[which(sce$CellType=='AT2 2'), ], col='firebrick')
+plot(umap, asp=1, col = 'grey90', main='AT2 2', cex=.5)
+points(umap[which(sce$CellType=='AT1'), ], col=3, cex=.5)
+points(umap[which(sce$CellType=='AT2 1'), ], col=2, cex=.5)
+points(umap[which(sce$CellType=='AT2 2'), ], col='firebrick', cex=.5)
 
 
 # just AT1 and AT2 cells
@@ -64,12 +70,17 @@ pairs(subpca$x[,1:3], asp=1, col= colorby(subsce$CellType))
 pairs(subpca$x[,1:3], asp=1, col= colorby(factor(subsce$Age, levels = c('P3','P7','P14'))))
 
 subumap <- umap(subpca$x[,1:20])
-plot(subumap, asp=1, col = colorby(subsce$CellType))
+plot(subumap, asp=1, col = colorby(factor(subsce$CellType), colors = c(3,2,'firebrick')), cex=.5)
 
-plot(subumap, asp=1, col = 'grey80')
-points(subumap[which(assay(subsce,'counts')['Mki67',] > 0), ], col = 2)
-points(subumap[which(assay(subsce,'counts')['Top2a',] > 0), ], col = 2)
-
+plot(subumap, asp=1, col = 'grey90', cex=.5, main='Top2a')
+#points(subumap[which(assay(subsce,'counts')['Mki67',] > 0), ], col = 2)
+#points(subumap[which(assay(subsce,'counts')['Top2a',] > 0), ], col = 2)
+idx <- which(assay(subsce,'logcounts')['Mki67', ] > 0)
+points(subumap[idx,], cex=.5,
+       col = colorby(assay(subsce,'logcounts')['Mki67', ], colors = c('grey90','blue','darkblue'))[idx])
+idx <- which(assay(subsce,'logcounts')['Top2a', ] > 0)
+points(subumap[idx,], cex=.5,
+       col = colorby(assay(subsce,'logcounts')['Top2a', ], colors = c('grey90','blue','darkblue'))[idx])
 
 
 #umap <- umap(pca$x[which(sce$CellType %in% c('AT1','AT2 1','AT2 2','Ciliated','Club')), 1:25])
@@ -85,12 +96,13 @@ cl <- subsce$CellType[subsce$CellType %in% c('AT2 1','AT2 2')]
 require(slingshot)
 pst <- slingshot(rd)
 
-plot(subpca$x[,1:2], asp=1, col= colorby(subsce$CellType))
+plot(subpca$x[,1:2], asp=1, col= colorby(factor(subsce$CellType), colors = c(3,2,'firebrick')))
 points(subpca$x[subsce$CellType %in% c('AT2 1','AT2 2'),1:2], col = colorby(slingPseudotime(pst)[,1]))
 
-plot(subumap, asp=1, col = colorby(subsce$CellType))
-points(subumap[subsce$CellType %in% c('AT2 1','AT2 2'), ], col = colorby(slingPseudotime(pst)[,1]))
+plot(subumap, asp=1, col = 'grey90', cex=.5, main = 'AT2 Trajectory')
+points(subumap[subsce$CellType %in% c('AT2 1','AT2 2'), ], col = colorby(slingPseudotime(pst)[,1], colors = c(2,7,3)), cex=.5)
 
+#ec <- embedCurves(pst, subumap[subsce$CellType %in% c('AT2 1','AT2 2'), ])
 
 
 expr <- assay(subsce,'logcounts')[,subsce$CellType %in% c('AT2 1','AT2 2')]
@@ -108,7 +120,9 @@ plot(slingPseudotime(pst)[,1], assay(subsce,'logcounts')['Rpl23',subsce$CellType
 plot(subumap, asp=1, col = colorby(assay(subsce,'logcounts')['Rpl23',]))
 
 
-pstCors[order(abs(pstCors), decreasing = TRUE)]
+x <- pstCors[order(abs(pstCors), decreasing = TRUE)]
+
+cbind(names(x)[1:10], x[1:10])
 
 
 
