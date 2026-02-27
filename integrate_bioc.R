@@ -19,9 +19,9 @@ ct <- ct[allgenes, ]
 
 require(sctransform)
 options(future.globals.maxSize = 8000 * 1024^2)
-sctransform::vst(hx)
+out <- sctransform::vst(hx)
 
-
+plot(log1p(hx[rownames(out$y),1]), out$y[,1])
 
 
 require(batchelor)
