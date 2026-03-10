@@ -21,10 +21,19 @@ ct.celltype.conf <- apply(tab,1,function(x){
 })
 
 res <- data.frame(Cell_ID = ct$Cell_ID,
-                  CellType = ct.celltype,
-                  CellType_conf = ct.celltype.conf)
-res$CellType <- factor(res$CellType, levels = levels(sce$CellType))
+                  infCellType = ct.celltype,
+                  infCellType_conf = ct.celltype.conf)
+res$infCellType <- factor(res$infCellType, levels = levels(sce$CellType))
 
 x <- merge(colData(sce), res, by = 'Cell_ID',
            all.x = TRUE, sort = FALSE)
+x$combinedCellType <- ifelse(is.na(x$CellType), x$infCellType, x$CellType)
+x <- x[match(colnames(sce), x$Cell_ID), ]
+
+# check
+all(colnames(sce) == x$Cell_ID)
+
+colData(sce) <- x
+
+saveRDS(sce, file = 'data/integrated.rds')
 
