@@ -31,7 +31,7 @@ hx <- SingleCellExperiment(assay = list(counts = hx),
                            colData = meta)
 rm(meta)
 # just one sample
-samp <- 'P3_Normoxia'
+samp <- 'P14_Hyperoxia'
 sce <- hx[, which(hx$Sample == samp)]
 ### ### ###
 
@@ -40,7 +40,7 @@ sce <- hx[, which(hx$Sample == samp)]
 assay(sce,'logcounts') <- CellChat::normalizeData(assay(sce,'counts'))
 sce$samples <- factor(sce$Sample) # CellChat needs this name, specifically
 
-cch <- createCellChat(object = sce, group.by = "infCellType") # infCellType for our data
+cch <- createCellChat(object = sce, group.by = "CellType") # infCellType for our data
 CellChatDB <- CellChatDB.mouse
 CellChatDB.use <- subsetDB(CellChatDB) # use all CellChatDB except for "Non-protein Signaling" for cell-cell communication analysis
 # set the used database in the object
@@ -56,7 +56,7 @@ cch <- aggregateNet(cch)
 # Compute the network centrality scores
 cch <- netAnalysis_computeCentrality(cch, slot.name = "netP") # the slot 'netP' means the inferred intercellular communication network of signaling pathways
 
-saveRDS(cch, file = 'data/cch_ours_P14Norm.rds')
+saveRDS(cch, file = 'data/cch_hx_P14Hyper.rds')
 
 groupSize <- as.numeric(table(cch@idents))
 

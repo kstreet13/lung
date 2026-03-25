@@ -10,3 +10,15 @@ Trajectory analysis of EMT
 Might be interaction between mesenchyme and epithelial
 Ligand/receptor analysis of this communication
 Have list of 6 ligands - table towards the end of the grant
+
+
+2026-03-20
+----------
+Initial analysis of new data
+8 samples - 4 hyperoxia, 4 room air
+main effect looks like a batch effect (every cell type affected)
+add individual mouse to vars.to.regress in SCTransform
+maybe doublet issues - scDblFinder
+AT2 is the progenitor/stem cell, becomes activated upon injury
+*** send heatmap and scatter plots
+
