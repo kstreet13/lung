@@ -20,5 +20,5 @@ main effect looks like a batch effect (every cell type affected)
 add individual mouse to vars.to.regress in SCTransform
 maybe doublet issues - scDblFinder
 AT2 is the progenitor/stem cell, becomes activated upon injury
-*** send heatmap and scatter plots
+send heatmap and scatter plots
 
