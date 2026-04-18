@@ -1,3 +1,5 @@
+require(CellChat)
+
 # differential signalling between control and hyperoxia
 
 norm <- readRDS('data/cch_hx_P14Norm.rds')
@@ -42,6 +44,8 @@ cellchat <- netEmbedding(cellchat, type = "functional")
 cellchat <- netClustering(cellchat, type = "functional")
 netVisual_embeddingPairwise(cellchat, type = "functional", label.size = 3.5)
 
+rankSimilarity(cellchat, type = "functional")
+
 # cellchat <- computeNetSimilarityPairwise(cellchat, type = "structural")
 # cellchat <- netEmbedding(cellchat, type = "structural")
 # cellchat <- netClustering(cellchat, type = "structural")
@@ -55,6 +59,9 @@ gg2 <- rankNet(cellchat, mode = "comparison", measure = "weight", sources.use = 
 gg1 + gg2
 
 
+# Differential Expression analysis
+##################################
+
 # define a positive dataset, i.e., the dataset with positive fold change against the other dataset
 pos.dataset = "hyp"
 features.name = paste0(pos.dataset, ".merged")
@@ -62,10 +69,36 @@ cellchat <- identifyOverExpressedGenes(cellchat, group.dataset = "datasets", pos
 net <- netMappingDEG(cellchat, features.name = features.name, variable.all = TRUE)
 net.up <- subsetCommunication(cellchat, net = net, datasets = "hyp",ligand.logFC = 0.05, receptor.logFC = NULL)
 net.down <- subsetCommunication(cellchat, net = net, datasets = "norm",ligand.logFC = -0.05, receptor.logFC = NULL)
+net.up
+net.down
+gene.up <- extractGeneSubsetFromPair(net.up, cellchat)
+gene.down <- extractGeneSubsetFromPair(net.down, cellchat)
 
-# up in hyperoxia
-computeEnrichmentScore(net.up, species = 'human', variable.both = TRUE)
 
-# up in normoxia
-computeEnrichmentScore(net.down, species = 'human', variable.both = TRUE)
+# word cloud: up in hyperoxia
+computeEnrichmentScore(net.up, species = 'mouse', variable.both = TRUE)
+# word cloud: up in normoxia
+computeEnrichmentScore(net.down, species = 'mouse', variable.both = TRUE)
 
+
+# too busy
+netVisual_bubble(cellchat, 
+                 sources.use = c('Myofibroblast','Col13a1+ fibroblast','Col14a1+ fibroblast'), 
+                 targets.use = c('AT1','AT2 1','AT2 2'),  
+                 comparison = c(1, 2), angle.x = 45)
+
+
+gg1 <- netVisual_bubble(cellchat, sources.use = c('Myofibroblast','Col13a1+ fibroblast','Col14a1+ fibroblast'), targets.use = c('AT1','AT2 1','AT2 2'),  comparison = c(1, 2), max.dataset = 2, title.name = "Increased signaling in Hyperoxia", angle.x = 45, remove.isolate = T)
+#> Comparing communications on a merged object
+gg2 <- netVisual_bubble(cellchat, sources.use = c('Myofibroblast','Col13a1+ fibroblast','Col14a1+ fibroblast'), targets.use = c('AT1','AT2 1','AT2 2'),  comparison = c(1, 2), max.dataset = 1, title.name = "Decreased signaling in Hyperoxia", angle.x = 45, remove.isolate = T)
+#> Comparing communications on a merged object
+gg1 + gg2
+
+
+
+
+
+
+# Gene Expression
+
+plotGeneExpression(cellchat, signaling = "TGFb", split.by = "datasets", colors.ggplot = T, type = "violin")

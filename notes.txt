@@ -22,3 +22,29 @@ maybe doublet issues - scDblFinder
 AT2 is the progenitor/stem cell, becomes activated upon injury
 send heatmap and scatter plots
 
+
+2026-04-10
+----------
+AT2 -> AT1 (normally destroyed during hyperoxia)
+want to understand signaling related to this transition
+might get IGF or TGFB KO mice, get more scRNA
+IPF (disease) blocks steps of transition
+does TGFB have a role in the AT2->AT1 transition? (yes?)
+two different models: development and injury
+want to look at both
+can knock out early or later in development (currently only have mice for later knockout)
+what kind of communication goes on between the mesenchym and the epithelium
+
+
+
+2026-04-17
+----------
+Jing did DE on hyperoxia vs. normal
+switching from Seurat+SCTransform to SCE+scry
+got full data from Jing
+try running sctransform::vst
+otherwise try scry
+
+
+
+
