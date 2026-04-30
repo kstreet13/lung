@@ -47,4 +47,14 @@ otherwise try scry
 
 
 
+2026-04-24
+----------
+I got nullResiduals to run on the full data, ran PCA+UMAP
+somehow lost the HDF5 file, but saved PCA
+Other study: LTC (transcrocetin), immune-related chemical from saffron
+Craig wants to see if it effects lung development (improves(?) oxygenation)
+how can we model (human) pre-term birth in mice? pre-term babies need oxygen
+*** have list of marker genes from Jing, make bubble plot
+*** try integrating samples a bit better
+
 
