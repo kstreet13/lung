@@ -56,5 +56,20 @@ Craig wants to see if it effects lung development (improves(?) oxygenation)
 how can we model (human) pre-term birth in mice? pre-term babies need oxygen
 *** have list of marker genes from Jing, make bubble plot
 *** try integrating samples a bit better
+*** check Sftca1 -> Sftpa1
+
+
+2026-05-21
+----------
+find out if subgroups of epithelial cells have corresponding subgroups in past studies
+datasets: 
+ - PN14_Ctrl is "Freemont's data"
+ - lung_data/rawcounts.rds is from Nature paper from Canadian group, on GEO
+ - combined8 is our (Jing's) data
+Want to integrate controls from Jing's data with PN14 Freemont data
+*** run doublet detection
+
+
+Most up-to-date dataset: data/combined8filt_leiden
 
 

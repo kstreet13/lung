@@ -113,7 +113,42 @@ sce <- devianceFeatureSelection(sce, batch = factor(sce$orig.ident), sorted = TR
 saveHDF5SummarizedExperiment(sce, dir = 'data/combined8_filt')
 
 
-# PCA
+# fastMNN - this actually makes a difference
+require(batchelor)
+sce <- fastMNN(sce, assay.type = 'binomial_deviance_residuals', batch = sce$orig.ident, subset.row = 1:2000) # top 2000 highest deviance genes
+
+saveRDS(reducedDim(sce,'corrected'), file='data/tmp/fastMNNcorrected.rds')
+
+plot(colVars(reducedDim(sce,'corrected')))
+require(BiocSingular)
+#pca <- runPCA(reducedDim(sce,'corrected'), rank = 50)
+#plot(pca$sdev^2)
+require(uwot)
+umap <- umap(reducedDim(sce,'corrected')[,1:26])
+
+saveRDS(umap, file='data/tmp/fastMNNumap.rds')
+
+# update SCE
+rm(sce)
+sce <- loadHDF5SummarizedExperiment('data/combined8filt_dimreds/')
+reducedDimNames(sce) <- c('OLDpca','OLDumap')
+cor <- readRDS('data/tmp/fastMNNcorrected.rds')
+reducedDim(sce,'fastMNN') <- cor
+rm(cor)
+umap <- readRDS('data/tmp/fastMNNumap.rds')
+reducedDim(sce,'umap') <- umap
+rm(umap)
+
+saveHDF5SummarizedExperiment(sce, dir = 'data/combined8filt_fastMNN')
+
+
+
+
+### OLD STUFF ###
+
+
+
+# PCA - probably unnecessary
 require(BiocSingular)
 pca <- runPCA(t(assay(sce,'binomial_deviance_residuals')[1:2000,]), rank = 50, get.rotation = FALSE)
 saveRDS(pca, file = 'data/combined8filt_binomdevresidPCA.rds')
@@ -123,17 +158,17 @@ plot(pca$sdev^2)
 
 # UMAP
 require(uwot)
-pca <- readRDS('data/combined8_binomdevresidPCA.rds')
-umap <- umap(pca$x[,1:13])
+pca <- readRDS('data/combined8filt_binomdevresidPCA.rds')
+umap <- umap(pca$x[,1:23])
 
 ind <- sample(ncol(sce))
 plot(umap[ind,], asp=1, cex=.25, col = colorby(sce$orig.ident[ind]))
 
 
 # regress out sample?
-l <- lm(pca$x ~ sce$orig.ident)
-l <- l$residuals
-sapply(1:13, function(pc){ cor(l[,pc], pca$x[,pc]) })
+# l <- lm(pca$x ~ sce$orig.ident)
+# l <- l$residuals
+# sapply(1:13, function(pc){ cor(l[,pc], pca$x[,pc]) })
 # makes no difference
 
 
@@ -149,42 +184,6 @@ reducedDim(sce,'umap') <- umap
 saveHDF5SummarizedExperiment(sce, dir = 'data/combined8filt_dimreds')
 
 #
-
-
-
-
-
-
-
-
-
-
-
-# combine counts matrices
-counts <- do.call(cbind, counts)
-rownames(meta) <- colnames(counts)
-
-rm(counts,meta)
-sce$sample <- sce$orig.ident
-sce$state <- gsub('_.*$', '', as.character(sce$sample))
-
-require(HDF5Array)
-saveHDF5SummarizedExperiment(sce, dir = 'data/combined')
-rm(sce)
-
-require(scry)
-require(HDF5Array)
-sce <- loadHDF5SummarizedExperiment('data/combined/')
-sce <- devianceFeatureSelection(sce, batch = factor(sce$sample), sorted = TRUE)
-#sce <- nullResiduals(sce, assay="counts", type="deviance", batch = factor(sce$sample))
-subs <- lapply(levels(sce$sample), function(samp){
-  nullResiduals(sce[, which(sce$sample == samp)], assay="counts", type="deviance")
-})
-sce <- do.call(cbind, subs)
-saveHDF5SummarizedExperiment(sce, dir = 'data/combined', replace = TRUE)
-
-
-
 
 
 
