@@ -20,3 +20,8 @@ dblScr2 <- scDblFinder(sce, samples = 'sample',
                        includePCs = 25, returnType = 'scores')
 
 
+ind <- sample(ncol(sce))
+plot(reducedDim(sce,'umap')[ind,], asp=1, cex=.25, col = colorby(dblScr2$class[ind]), xlab = 'UMAP-1', ylab = 'UMAP-2')
+legendby(dblScr2$class)
+
+
