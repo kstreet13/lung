@@ -1,6 +1,6 @@
 
-# compare their data with "our" data
-# PN14 Ctrl (ours) vs. hyperoxia (theirs, sce from GEO)
+# compare their data with our data
+# PN14 Ctrl ("ours", "Freemont") vs. hyperoxia ("theirs", sce from GEO)
 
 require(Seurat)
 options(future.globals.maxSize = 16000 * 1024^2)

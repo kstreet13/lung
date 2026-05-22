@@ -1,7 +1,7 @@
 # transfer labels from annotated hypoxia data
 require(SingleCellExperiment)
 
-# preprocessing "their" dataset
+# preprocessing "their" dataset (from Nature paper?)
 theirs <- readRDS('~/OneDrive - University of Southern California/lung_data/rawcounts.rds')
 theirs <- SingleCellExperiment(assays = list(counts = theirs))
 int <- readRDS('data/integrated.rds')
