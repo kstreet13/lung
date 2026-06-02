@@ -14,14 +14,27 @@ require(scDblFinder)
 # are the different batches/wells (i.e. independent captures, since doublets
 # cannot arise across them) rather than biological samples.
 
-dblScr <- scDblFinder(sce, clusters = 'leiden.r1', samples = 'sample',
-                      includePCs = 25, returnType = 'scores')
-dblScr2 <- scDblFinder(sce, samples = 'sample',
-                       includePCs = 25, returnType = 'scores')
+dbl.clus.samp <- scDblFinder(sce, clusters = 'leiden.r1', samples = 'sample',
+                      includePCs = 25, returnType = 'scores', dbr.sd = 1)
+dbl.noclus.samp <- scDblFinder(sce, samples = 'sample',
+                       includePCs = 25, returnType = 'scores', dbr.sd = 1)
+
+colData(sce)$dbl.clus.samp <- dbl.clus.samp
+colData(sce)$dbl.noclus.samp <- dbl.noclus.samp
+
+saveHDF5SummarizedExperiment(sce, dir = 'data/combined8filt_dbl')
+
+# dbl.clus.nosamp <- scDblFinder(sce, clusters = 'leiden.r1',
+#                              includePCs = 25, returnType = 'scores')
+# dbl.noclus.nosamp <- scDblFinder(sce,
+#                                includePCs = 25, returnType = 'scores')
+
+
+
 
 
 ind <- sample(ncol(sce))
-plot(reducedDim(sce,'umap')[ind,], asp=1, cex=.25, col = colorby(dblScr2$class[ind]), xlab = 'UMAP-1', ylab = 'UMAP-2')
-legendby(dblScr2$class)
+plot(reducedDim(sce,'umap')[ind,], asp=1, cex=.25, col = colorby(sce$dbl.noclus.samp$class[ind]), xlab = 'UMAP-1', ylab = 'UMAP-2')
+legendby(sce$dbl.noclus.samp$class[ind])
 
 

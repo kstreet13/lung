@@ -43,7 +43,9 @@ require(dittoSeq)
 dittoDotPlot(sce, assay = 'counts', vars = markers, group.by = 'clus')
 
 
-
+# doublets?
+boxplot(sce$dbl.noclus.samp$score ~ sce$clus)
+mosaicplot(table(sce$clus, sce$dbl.noclus.samp$class), col=2:1)
 
 
 ind <- sample(ncol(sce))

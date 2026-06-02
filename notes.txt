@@ -70,6 +70,16 @@ Want to integrate controls from Jing's data with PN14 Freemont data
 *** run doublet detection
 
 
-Most up-to-date dataset: data/combined8filt_leiden
+2026-05-29
+----------
+*** Actually, want to integrate PN14 Freemont data with ALL of Jing's data
+*** Look specifically at mesynchymal cells
+
+
+
+
+
+
+Most up-to-date dataset: data/combined8filt_dbl
 
 
