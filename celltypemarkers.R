@@ -1,10 +1,10 @@
 
 markers <- list(
-  c('Nkx2-1','Epcam'),	
-  c('Hopx','Aqp5'),	
-  c('Sftpc','Sftpa1'), # was Sftca1	
-  c('Scgb1a1','Scgb3a2'),	
-  c('Foxj1','Dynlrb2'),
+  c('Nkx2-1','Epcam'), # Epithelial	
+  c('Hopx','Aqp5'),	# AT1
+  c('Sftpc','Sftpa1'), # AT2 (was Sftca1)	
+  c('Scgb1a1','Scgb3a2'),	# Club
+  c('Foxj1','Dynlrb2'), # Ciliated
   
   c('Cdh5','Pecam1'),
   c('Gpihbp1','Kit','Aplnr'),

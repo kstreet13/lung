@@ -76,10 +76,18 @@ Want to integrate controls from Jing's data with PN14 Freemont data
 *** Look specifically at mesynchymal cells
 
 
+2026-06-05
+----------
+make a figure of what cluster represents
 
 
+2026-06-12
+----------
+didn't re-run PCA/UMAP after removing doublets
+*** trajectory AT2->AT1 (AT2 are stem cells)
+*** send Jing new bubble plot and UMAP
 
 
-Most up-to-date dataset: data/combined8filt_dbl
+Most up-to-date dataset: data/combined8reclus (forgot to re-run PCA after dropping doublets, now I have)
 
 

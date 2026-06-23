@@ -1,15 +1,32 @@
 require(HDF5Array)
 require(SingleCellExperiment)
 
-sce <- loadHDF5SummarizedExperiment('data/combined8filt_leiden/')
+sce <- loadHDF5SummarizedExperiment('data/combined8filt_dbl/')
+sce <- sce[ ,which(sce$dbl.clus.samp$class == 'singlet')]
+sce$leiden.r1.predbl <- sce$leiden.r1
 
-# perform Leiden clustering in Seurat
+# re-run PCA and UMAP after removing doublets
+sce <- loadHDF5SummarizedExperiment('data/combined8filt/')
+reducedDim(sce,'OLDpca') <- NULL
+reducedDim(sce,'OLDumap') <- NULL
+reducedDim(sce,'umap_dbl') <- reducedDim(sce,'umap')
+reducedDim(sce,'umap') <- NULL
+
+require(BiocSingular)
+pca <- runPCA(reducedDim(sce,'fastMNN'), rank = 50)
+#plot(pca$sdev^2)
+reducedDim(sce,'pca') <- pca$x
+rm(pca)
+require(uwot)
+reducedDim(sce,'umap') <- umap(reducedDim(sce,'pca')[,1:24])
+
+# perform Leiden clustering in Seurat (somehow, clusters are identical whether you use 24 or 50 PCs)
 # set up Seurat object
 require(Seurat)
 require(Matrix)
 so <- Matrix(0, nrow = nrow(sce), ncol = ncol(sce), sparse = TRUE)
 so <- CreateSeuratObject(so)
-pca <- CreateDimReducObject(embeddings = reducedDim(sce,'fastMNN'), key = "PC_")
+pca <- CreateDimReducObject(embeddings = reducedDim(sce,'pca'), key = "PC_")
 colnames(so) <- rownames(pca)
 so@reductions[['pca']] <- pca
 rm(pca)
@@ -18,6 +35,7 @@ rm(pca)
 so <- FindNeighbors(so, reduction = 'pca')
 so <- FindClusters(so, algorithm = 4, resolution = 1)
 
+sce$leiden.r1.oldpca <- sce$leiden.r1
 sce$leiden.r1 <- so$seurat_clusters
 #rm(so)
 
@@ -25,22 +43,17 @@ ind <- sample(ncol(sce))
 cc <- rep(c(brewer.pal(9,'Set1'), brewer.pal(8,'Set2'), brewer.pal(12,'Set3')), length.out = length(levels(sce$leiden.r1)))
 plot(reducedDim(sce,'umap')[ind,], asp=1, cex=.25, col = cc[sce$leiden.r1[ind]])
 
+# save
+saveHDF5SummarizedExperiment(sce, dir='data/combined8reclus')
+
 
 # get markers (from Jing)
 source('celltypemarkers.R')
 
-# try to find appropriate ordering for clusters
-sce$clus <- sce$leiden.r1
-means <- sapply(levels(sce$clus), function(clID){
-  colMeans(reducedDim(sce,'fastMNN')[which(sce$clus==clID), ])
-})
-ord <- hclust(dist(t(means)))$order
-
-levels(sce$clus) <- ord
-stopifnot(all(!is.na(sce$clus)))
+sce <- loadHDF5SummarizedExperiment('data/combined8reclus')
 
 require(dittoSeq)
-dittoDotPlot(sce, assay = 'counts', vars = markers, group.by = 'clus')
+dittoDotPlot(sce, assay = 'counts', vars = markers, group.by = 'leiden.r1')
 
 
 # doublets?
