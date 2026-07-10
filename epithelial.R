@@ -7,6 +7,8 @@
 # 33: AT1
 # 35: Club/Ciliated
 
+set.seed(1)
+
 require(HDF5Array)
 require(SingleCellExperiment)
 sce <- loadHDF5SummarizedExperiment('data/combined8reclus/')
@@ -36,17 +38,17 @@ plot3d(umap3, col=colorby(as.character(sce$leiden.r1)), aspect = 1)
 
 
 # multiple umaps to examine common features
-umaps <- lapply(c(8,14,20,50), function(k){
-  umap <- umap(pca$x[,1:k], n_components = 2)
-  return(umap)
-})
-layout(matrix(1:4, 2,2, byrow = TRUE))
-for(umap in umaps){
-  ind <- sample(nrow(umap))
-  plot(umap[ind,],asp=1,col=colorby(as.character(sce$condition[ind])), cex=.25)
-  #legendby(as.character(sce$leiden.r1))
-}
-layout(1)
+# umaps <- lapply(c(8,14,20,50), function(k){
+#   umap <- umap(pca$x[,1:k], n_components = 2)
+#   return(umap)
+# })
+# layout(matrix(1:4, 2,2, byrow = TRUE))
+# for(umap in umaps){
+#   ind <- sample(nrow(umap))
+#   plot(umap[ind,],asp=1,col=colorby(as.character(sce$condition[ind])), cex=.25)
+#   #legendby(as.character(sce$leiden.r1))
+# }
+# layout(1)
 
 ##############
 # RE-CLUSTER #
@@ -66,17 +68,59 @@ rm(pca)
 so <- FindNeighbors(so, reduction = 'pca')
 so <- FindClusters(so, algorithm = 4, resolution = .4)
 
-sce$epith.clus <- so$seurat_clusters
+sce$clus.epi <- so$seurat_clusters
 #rm(so)
+sce$clus.epi <- factor(paste0('E',sce$clus.epi))
+levels(sce$clus.epi) <- paste0('E',1:11)
 
-sce$epith.clus <- factor(paste0('E',sce$epith.clus))
+# plot
+plot(umap2,asp=1,col=colorby(as.character(sce$clus.epi)))
+#legendby(as.character(sce$clus.epi))
+labelby(umap2,as.character(sce$clus.epi))
 
-plot(umap2,asp=1,col=colorby(as.character(sce$epith.clus)))
-legendby(as.character(sce$epith.clus))
-labelby(umap2,as.character(sce$epith.clus))
+plot3d(umap3, col=colorby(as.character(sce$clus.epi)), aspect = 1)
+
+################
+# SAVE EPITHELIAL STUFF (DR/CLUS)
+################
+saveRDS(list(clus.epi = sce$clus.epi,
+             pca.epi = pca.epi$x[,1:12],
+             umap2.epi = umap2,
+             umap3.epi = umap3),
+        file = 'data/epithelialANNO.rds')
+###
 
 
-plot3d(umap3, col=colorby(as.character(sce$epith.clus)), aspect = 1)
+################
+# LOAD / RESET Epithelial SCE
+################
+require(HDF5Array)
+require(SingleCellExperiment)
+sce <- loadHDF5SummarizedExperiment('data/combined8reclus/')
+sce <- sce[ ,which(sce$leiden.r1 %in% c(2,14,21,22,32,33,35))]
+anno <- readRDS('data/epithelialANNO.rds')
+sce$clus.epi <- anno$clus.epi
+reducedDim(sce,'pca.epi') <- anno$pca.epi
+reducedDim(sce,'umap2.epi') <- anno$umap2.epi
+reducedDim(sce,'umap3.epi') <- anno$umap3.epi
+rm(anno)
+################
+################
+
+# UMAP plots
+ind <- sample(ncol(sce))
+plot(reducedDim(sce,'umap2.epi')[ind,],asp=1,col=colorby(as.character(sce$clus.epi[ind])), cex=.5)
+labelby(reducedDim(sce,'umap2.epi'),as.character(sce$clus.epi))
+
+plot(reducedDim(sce,'umap2.epi')[ind,],asp=1,col=colorby(sce$condition)[ind], cex=.5)
+legendby(sce$condition)
+
+
+plot3d(reducedDim(sce,'pca.epi')[,1:3], col=colorby(as.character(sce$clus.epi)), aspect = 1)
+
+# marker plots
+gene <- 'Lyz1'
+plot(reducedDim(sce,'umap2.epi')[ind,],asp=1,col=colorby(assay(sce,'binomial_deviance_residuals')[gene,ind], colors = c('grey90','lightgreen','green','darkgreen','blue','darkblue')), cex=.5)
 
 
 
@@ -99,7 +143,7 @@ markers$AT2 <- markers$AT2[markers$AT2 %in% rownames(sce)]
 markers$ClubCil <- markers$ClubCil[markers$ClubCil %in% rownames(sce)]
 
 require(dittoSeq)
-dittoDotPlot(sce, assay = 'counts', vars = markers, group.by = 'epith.clus')
+dittoDotPlot(sce, assay = 'counts', vars = markers, group.by = 'clus.epi')
 
 # E9 (pale orange) is club/ciliated
 
@@ -127,7 +171,7 @@ plot(umap2[ind,],asp=1,col=colorby(sce$condition)[ind], main = 'Condition')
 legendby(sce$condition)
 
 # distributions
-boxplot(so$AT1_1 ~ sce$epith.clus)
+boxplot(so$AT1_1 ~ sce$clus.epi)
 
 
 
@@ -165,6 +209,59 @@ plot(umap2,asp=1,col=colorby(so$apopEpi1, colors = c('grey80','yellow', 'green',
 
 
 
-# RNA velocity for flow between E1/2/3, E7/8
+#####################
 # re-add doublets to see if there's a bridge
+#####################
+# this did not seem to make any difference, just added some more points
+require(HDF5Array)
+require(SingleCellExperiment)
+sce <- loadHDF5SummarizedExperiment('data/combined8reclus/')
+sce <- sce[ ,which(sce$leiden.r1 %in% c(2,14,21,22,32,33,35))]
+epi.cells <- colnames(sce)
 
+pca <- readRDS('data/tmp/fastMNNcorrected.rds')
+plot(colVars(pca))
+dbl <- readRDS('data/tmp/dblclussamp.rds')
+
+# include doublet if any of 5 NNs are in epithelial clus
+require(BiocNeighbors)
+knn <- findKNN(pca[,1:25], k = 5)
+knn <- knn$index[which(dbl$class == 'doublet'),]
+keep <- apply(knn,1,function(kn){
+  any(rownames(pca)[kn] %in% epi.cells)
+})
+keep.cells <- rownames(pca)[which(dbl$class == 'doublet')][keep]
+cells <- c(epi.cells, keep.cells)
+
+# "re-focus" pca
+require(BiocSingular)
+pca <- runPCA(pca[cells,], rank=50)
+plot(pca$sdev^2)
+pca.epi <- pca$x[,1:13]
+
+cd <- colData(sce)
+cd$barcode <- rownames(cd)
+
+cd <- data.frame(class = rep('singlet', nrow(pca.epi)))
+cd$class[which(cells %in% keep.cells)] <- 'doublet'
+
+require(uwot)
+umap2 <- umap(pca.epi, n_components = 2)
+umap3 <- umap(pca.epi, n_components = 3)
+
+plot(umap2,asp=1,col=colorby(cd$class), cex=.25)
+legendby(cd$class)
+
+plot3d(umap3, aspect = 1, col=colorby(cd$class))
+
+################
+################
+
+
+
+
+
+
+# RNA velocity for flow between E1/2/3, E7/8
+# DE in the Lyz1-high cluster (E4?)
+# DE between big AT2 groups (~ RA v. HO)
