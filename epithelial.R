@@ -116,13 +116,21 @@ plot(reducedDim(sce,'umap2.epi')[ind,],asp=1,col=colorby(sce$condition)[ind], ce
 legendby(sce$condition)
 
 
+layout(matrix(1:2,nrow=1))
+ind <- which(sce$condition=='RA')
+plot(reducedDim(sce,'umap2.epi')[ind,],asp=1,col=colorby(sce$condition)[ind], cex=.25)
+ind <- which(sce$condition=='HO85')
+plot(reducedDim(sce,'umap2.epi')[ind,],asp=1,col=colorby(sce$condition)[ind], cex=.25)
+
+
+
 plot3d(reducedDim(sce,'pca.epi')[,1:3], col=colorby(as.character(sce$clus.epi)), aspect = 1)
 
 # marker plots
-gene <- 'Lyz1'
+gene <- 'Top2a'
 plot(reducedDim(sce,'umap2.epi')[ind,],asp=1,col=colorby(assay(sce,'binomial_deviance_residuals')[gene,ind], colors = c('grey90','lightgreen','green','darkgreen','blue','darkblue')), cex=.5)
 
-
+boxplot(assay(sce,'binomial_deviance_residuals')[gene,] ~ sce$clus.epi)
 
 
 # markers from LungMAP
@@ -136,11 +144,14 @@ plot(reducedDim(sce,'umap2.epi')[ind,],asp=1,col=colorby(assay(sce,'binomial_dev
 markers <- list(
   AT1 = c('Ager','Rtkn2','Sema3b','Akap5','Cldn18','Emp2','Aqp5','Clic5','Msln','Lmo7','Hopx'),
   AT2 = c('Lamp3','Abca3','Kcnj15','Sftpa1','Lyz2','Lyz3','Lyz1','Sftpb','Sftpc','Slc34a2','Chi3l1'),
-  ClubCil = c('Scgb1a1','Scgb3a2','Foxj1','Dynlrb2')
+  ClubCil = c('Scgb1a1','Scgb3a2','Foxj1','Dynlrb2'),
+  Other = c('Retnla')
 )
 markers$AT1 <- markers$AT1[markers$AT1 %in% rownames(sce)]
 markers$AT2 <- markers$AT2[markers$AT2 %in% rownames(sce)]
 markers$ClubCil <- markers$ClubCil[markers$ClubCil %in% rownames(sce)]
+
+sce$clus_cond <- factor(paste0(sce$clus.epi,'_',sce$condition))
 
 require(dittoSeq)
 dittoDotPlot(sce, assay = 'counts', vars = markers, group.by = 'clus.epi')

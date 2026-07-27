@@ -95,6 +95,24 @@ send Jing new bubble plot and UMAP
 Send epithelial cluster figures
 
 
+2026-07-10
+----------
+DE between E4 and other AT2s
+- what is E4?
+DE between the "horn" clusters
+velocity plots split by condition
+
+
+2026-07-17
+----------
+*** pathway analysis on DE results
+
+
+
+
+
+
+
 Most up-to-date dataset: data/combined8reclus (forgot to re-run PCA after dropping doublets, now I have)
 
 
