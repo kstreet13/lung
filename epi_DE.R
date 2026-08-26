@@ -1,3 +1,6 @@
+require(scran)
+require(scater)
+require(scrapper)
 ################
 # LOAD / RESET Epithelial SCE
 ################
@@ -11,7 +14,67 @@ reducedDim(sce,'pca.epi') <- anno$pca.epi
 reducedDim(sce,'umap2.epi') <- anno$umap2.epi
 reducedDim(sce,'umap3.epi') <- anno$umap3.epi
 rm(anno)
+###############
+# add logcounts
+sce <- logNormCounts(sce)
 
+
+# get L/R data from CellChat
+load('data/CellChatDB.mouse.rda')
+db <- CellChatDB.mouse; rm(CellChatDB.mouse)
+# db$interaction lists ligand/receptor pairs
+# db$geneInfo lists gene Symbol and Synonym (alt. name)
+
+# get list of RECEPTORS
+receptors <- unique(c(db$interaction$receptor,
+                      db$geneInfo$Synonym[db$geneInfo$Symbol %in% db$interaction$receptor],
+                      db$geneInfo$Symbol[db$geneInfo$Synonym %in% db$interaction$receptor]))
+
+# Differential Expression
+# E3 vs. E1+E2
+sub <- sce[, sce$clus.epi %in% c('E1','E2','E3')]
+
+de <- scran::scoreMarkers(sub, groups = sub$clus.epi, block = sub$sample, assay.type = 'logcounts')
+de <- de$E3
+de$adj.mean.AUC <- de$mean.AUC
+de$adj.mean.AUC[de$mean.AUC < .5] <- 1 - de$mean.AUC[de$mean.AUC < .5]
+de$receptor <- rownames(de) %in% receptors
+
+# Violin plots
+plotExpression(sub, exprs_values = "logcounts",
+               features = head(rownames(de[order(de$mean.AUC, decreasing = TRUE), ])), 
+               x="condition", colour_by="condition")
+
+plotExpression(sub, exprs_values = "logcounts",
+               features = head(rownames(de[order(de$mean.AUC, decreasing = FALSE), ])), 
+               x="clus.epi", colour_by="clus.epi")
+
+# receptors only
+plotExpression(sub, exprs_values = "logcounts",
+               features = head(rownames(de[de$receptor, ][order(de$mean.AUC[de$receptor], decreasing = FALSE), ])), 
+               x="clus.epi", colour_by="clus.epi")
+
+
+
+# "Volcano" plot
+plot(de$mean.logFC.cohen, de$mean.AUC, cex=.5, col=rgb(0,0,0,.5))
+# points(de$mean.logFC.cohen[de$receptor], de$mean.AUC[de$receptor], cex=.75, col=2)
+abline(v=0,lty=2,col='grey'); abline(h=.5, lty=2,col='grey')
+text(de$mean.logFC.cohen, de$mean.AUC, labels = rownames(de), cex=.5)
+
+plot(de$mean.logFC.cohen, de$adj.mean.AUC, cex=.5)
+# points(de$mean.logFC.cohen[de$receptor], de$adj.mean.AUC[de$receptor], cex=.75, col=2)
+abline(v=0,lty=2,col='grey'); abline(h=.5, lty=2,col='grey')
+# text(de$mean.logFC.cohen, de$adj.mean.AUC, labels = rownames(de), cex=.5)
+
+
+
+
+
+
+##################
+# OLD SEURAT WAY #
+##################
 
 # DE between E4 and other AT2s
 #  - what is E4?

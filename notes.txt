@@ -105,9 +105,22 @@ velocity plots split by condition
 
 2026-07-17
 ----------
-*** pathway analysis on DE results
+pathway analysis on DE results
 
 
+2026-08-03
+----------
+DE analysis split by ligand/receptor/other (receptors maybe more important for epithelial?)
+Jing will do similar with mesenchymal cells (ligands)
+
+
+2026-08-14
+----------
+Full workup on genes
+Thbs1 + receptors (done)
+*** gene info for all TGFb-related genes + violins
+*** make iSEE app for exploring gene expression
+*** wants: epithelial UMAP, mesenchymal UMAP, full UMAP, logNormCounts
 
 
 
