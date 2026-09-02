@@ -118,9 +118,17 @@ Jing will do similar with mesenchymal cells (ligands)
 ----------
 Full workup on genes
 Thbs1 + receptors (done)
-*** gene info for all TGFb-related genes + violins
-*** make iSEE app for exploring gene expression
-*** wants: epithelial UMAP, mesenchymal UMAP, full UMAP, logNormCounts
+gene info for all TGFb-related genes + violins
+make iSEE app for exploring gene expression
+wants: epithelial UMAP, mesenchymal UMAP, full UMAP, logNormCounts
+
+
+2026-08-28
+----------
+CellChat analysis shows that myofibroblasts (M4 and M7) significantly increase Thbs1-related signalling (sending) in hyperoxia
+*** look at Thbs1 signalling related to M4/M7
+
+
 
 
 
