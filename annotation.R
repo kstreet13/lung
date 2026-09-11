@@ -1,15 +1,15 @@
 require(HDF5Array)
 require(SingleCellExperiment)
 sce <- loadHDF5SummarizedExperiment('data/combined8reclus/')
-
-
+require(scater)
+sce <- logNormCounts(sce)
 
 
 # get markers (from Jing)
 source('celltypemarkers.R')
 
 require(dittoSeq)
-dittoDotPlot(sce, assay = 'counts', vars = markers, group.by = 'leiden.r1')
+dittoDotPlot(sce, assay = 'logcounts', vars = markers, group.by = 'leiden.r1')
 
 # Annotations of leiden.r1 based on bubble plot
 # 1: 
@@ -59,7 +59,13 @@ plot(reducedDim(sce,'umap')[ind,], asp=1, cex=.25, col = colorby(as.character(sc
 legendby(as.character(sce$condition), cex=2)
 dev.off()
 
-
+# separated
+layout(matrix(1:2,nrow=1))
+plot(reducedDim(sce,'umap'), asp=1, cex=.25, col = 'grey90', xlab = 'UMAP-1', ylab = 'UMAP-2', main = 'Room Air')
+points(reducedDim(sce,'umap')[which(sce$condition=='RA'),], cex=.25, col = alpha(4,alpha=.3))
+plot(reducedDim(sce,'umap'), asp=1, cex=.25, col = 'grey90', xlab = 'UMAP-1', ylab = 'UMAP-2', main = 'Hyperoxia')
+points(reducedDim(sce,'umap')[which(sce$condition=='HO85'),], cex=.25, col = alpha(2,alpha=.3))
+layout(1)
 
 
 ind <- sample(ncol(sce))
@@ -68,10 +74,10 @@ plot(reducedDim(sce,'umap')[ind,], asp=1, cex=.25, col = cc[sce$leiden.r1[ind]])
 
 
 # Marker plot
-gene <- 'Ptprc'
+gene <- 'Mki67'
 plot(reducedDim(sce,'umap'), asp=1, cex=.25, col = 'grey80', main=gene)
 points(reducedDim(sce,'umap'), asp=1, cex=.25, pch=16,
-       col = colorby(log1p(assay(sce,'counts')[gene,]), colors = c('grey80','red','darkred')))
+       col = colorby(assay(sce,'logcounts')[gene,], colors = c('grey80',4,'darkblue')))
 
 
 # Mesenchymal
@@ -102,6 +108,20 @@ for(clID in unique(sce$leiden.r1)){
   wilcox.test(ct[ind1], ct[ind2])$p.value
   
 }
+
+
+
+# RA vs HO
+cond <- factor(sce$condition, levels = c('RA','HO85'))
+tab <- table(cond, sce$leiden.r1)
+tab <- t(t(tab) / colSums(tab))
+layout(matrix(c(1,2,2),ncol=1))
+par(mar=c(.1,4,4,2))
+barplot(table(sce$leiden.r1), xlab='')
+par(mar=c(5,4,.1,2))
+barplot(tab, col = c(4,2))
+par(mar=c(5,4,4,2)+.1)
+layout(matrix(1))
 
 
 

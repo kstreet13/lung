@@ -127,7 +127,7 @@ plot(reducedDim(sce,'umap2.epi')[ind,],asp=1,col=colorby(sce$condition)[ind], ce
 plot3d(reducedDim(sce,'pca.epi')[,1:3], col=colorby(as.character(sce$clus.epi)), aspect = 1)
 
 # marker plots
-gene <- 'Tgfbr2'
+gene <- 'Mki67'
 plot(reducedDim(sce,'umap2.epi')[ind,],asp=1,col=colorby(assay(sce,'binomial_deviance_residuals')[gene,ind], colors = c('grey90','lightgreen','green','darkgreen','blue','darkblue')), cex=.5, main=gene)
 
 # "Tgfbr2"   "Tgfbr3"   "Tgfb2"    "Tgfbr1"   "Tgfbi"   "Tgfb1i1"  "Tgfb1"    "Tgfbrap1" "Tgfb3"    "Tgfbr3l" 

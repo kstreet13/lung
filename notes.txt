@@ -126,10 +126,19 @@ wants: epithelial UMAP, mesenchymal UMAP, full UMAP, logNormCounts
 2026-08-28
 ----------
 CellChat analysis shows that myofibroblasts (M4 and M7) significantly increase Thbs1-related signalling (sending) in hyperoxia
-*** look at Thbs1 signalling related to M4/M7
+look at Thbs1 signalling related to M4/M7
 
 
+2026-09-04
+----------
+*** try to simplify the main story for paper figures
 
+
+2026-09-11
+----------
+*** identify immune cell types
+*** add endothelial cell analysis
+send link to google slides
 
 
 
