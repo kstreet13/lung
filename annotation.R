@@ -7,13 +7,61 @@ sce <- logNormCounts(sce)
 
 # get markers (from Jing)
 source('celltypemarkers.R')
+mdf <- data.frame(gene = unlist(markers), celltype = rep(names(markers), times = lengths(markers)))
+rowData(sce)$subMarker <- mdf$celltype[match(rownames(sce), mdf$gene)]
+rowData(sce)$Marker <- rowData(sce)$subMarker
+rowData(sce)$Marker[rowData(sce)$Marker %in% c('AT1','AT2','Club','Ciliated')] <- 'Epithelial'
+rowData(sce)$Marker[rowData(sce)$Marker %in% c('gCAP','aCAP','Artery','Vein','Lymphatic')] <- 'Endothelial'
+rowData(sce)$Marker[rowData(sce)$Marker %in% c('Myofibroblast','Pericyte','Smooth muscle','Mesothelial')] <- 'Mesenchymal'
 
 require(dittoSeq)
 dittoDotPlot(sce, assay = 'logcounts', vars = markers, group.by = 'leiden.r1')
 
-# Annotations of leiden.r1 based on bubble plot
-# 1: 
+require(scDotPlot)
+scDotPlot(sce, features = unlist(markers), group = 'leiden.r1', featureAnno = 'Marker')
 
+# Annotations of leiden.r1 based on bubble plot
+# 1: Immune
+# 2: Epithelial - AT2
+# 3: Mesenchymal
+# 4: Mesenchymal
+# 5: Immune
+# 6: Endothelial
+# 7: Immune
+# 8: Immune
+# 9: Immune
+# 10: Mesenchymal
+# 11: Endothelial
+# 12: Immune
+# 13: Endothelial
+# 14: Epithelial - AT2
+# 15: Immune
+# 16: Mesenchymal
+# 17: Endothelial
+# 18: Endothelial
+# 19: Mesenchymal
+# 20: Endothelial
+# 21: Epithelial - AT1
+# 22: Epithelial - AT2
+# 23: Mesenchymal
+# 24: Immune
+# 25: Immune
+# 26: Immune
+# 27: Mesenchymal
+# 28: Mesenchymal
+# 29: ??? Immune?
+# 30: Immune
+# 31: Mesenchymal
+# 32: Epithelial - AT2
+# 33: Epithelial - AT1
+# 34: Immune
+# 35: Epithelial - Club/Ciliated
+
+
+# UMAP
+ind <- sample(ncol(sce))
+plot(reducedDim(sce,'umap')[ind,],asp=1,col=colorby(as.character(sce$leiden.r1[ind])), cex=.3)
+labelby(reducedDim(sce,'umap'), as.character(sce$leiden.r1))
 
 
 clus <- sce$leiden.r1
