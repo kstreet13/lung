@@ -142,6 +142,14 @@ send link to google slides
 
 
 
+2026-09-18
+----------
+*** use markers from Metzker paper to identify gCAP in endothelial subset
+*** figure out cellchat - number vs strength? "relative information flow" vs "information flow" mismatch?
+*** switch to scDotPlot
+
+
+
 
 Most up-to-date dataset: data/combined8reclus (forgot to re-run PCA after dropping doublets, now I have)
 

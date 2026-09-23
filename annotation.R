@@ -49,7 +49,7 @@ scDotPlot(sce, features = unlist(markers), group = 'leiden.r1', featureAnno = 'M
 # 26: Immune
 # 27: Mesenchymal
 # 28: Mesenchymal
-# 29: ??? Immune?
+# 29: Red blood cell/platelet
 # 30: Immune
 # 31: Mesenchymal
 # 32: Epithelial - AT2
