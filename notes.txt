@@ -149,6 +149,16 @@ send link to google slides
 *** switch to scDotPlot
 
 
+2026-09-25
+----------
+*** use markers from Metzker paper to identify gCAP in endothelial subset
+*** figure out cellchat - number vs strength? "relative information flow" vs "information flow" mismatch?
+*** switch to scDotPlot
+*** AT1/2 "scores"
+*** make AT2->1 trajectory (or at least healthy lineage)
+*** send Jing markers for endo5
+
+
 
 
 Most up-to-date dataset: data/combined8reclus (forgot to re-run PCA after dropping doublets, now I have)
